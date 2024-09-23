@@ -6,24 +6,25 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
+from langchain_ollama.chat_models import ChatOllama
+from langchain_ollama.llms import OllamaLLM
+from services.session import SessionService
 from services.vector_store import VectorStoreService
 from config import SYSTEM_PROMPT, HISTORY_PROMPT
 
-class RAGService:
-    def __init__(self, vector_store: VectorStoreService):
+class ChatService:
+    def __init__(self, vector_store: VectorStoreService, session_service: SessionService):
         self.vector_store = vector_store
+        self.session_service = session_service
         self.sessions = {}
         self.llm = None
         self.retriever = None
-        self.qa_chain = None
         self.rag_chain = None
     
     def _create_llm(self):
-        self.llm = ChatOpenAI(
-            base_url=os.getenv('API_URL'), 
-            api_key=os.getenv('API_KEY'), 
+        self.llm = OllamaLLM(
+            model=os.getenv('MODEL_NAME'),
             temperature=float(os.getenv('MODEL_TEMPERATURE', 0.7)),
-            streaming=True,
         )
 
     def _create_retriever(self, store_name):
@@ -51,8 +52,9 @@ class RAGService:
         return create_stuff_documents_chain(self.llm, qa_prompt)
 
     def _get_session_history(self, session_id: str) -> BaseChatMessageHistory:
-        if session_id not in self.sessions:
+        if not session_id in self.sessions:
             self.sessions[session_id] = ChatMessageHistory()
+        
         return self.sessions[session_id]
 
     def build(self, store_name):
@@ -67,7 +69,7 @@ class RAGService:
     async def chat(self, session_id, question):
         runnable = RunnableWithMessageHistory(
             self.rag_chain,
-            self._get_session_history,
+            self.session_service.get,
             input_messages_key="input",
             history_messages_key="chat_history",
             output_messages_key="answer",

@@ -15,21 +15,31 @@ This is a FastAPI application that implements a Retrieval-Augmented Generation (
 
 ## Installation
 
-Install the required packages:
-   ```
-   pip install -r requirements.txt
-   ```
+1. Install the required packages:
+
+    ```
+    pip install -r requirements.txt
+    ```
+2. Pull the model from Ollama:
+    ```
+    ollama pull <MODEL_NAME>
+    ```
+3. Pull the embedding model from Ollama:
+    ```
+    ollama pull <MODEL_NAME>
+    ```
+
+You can get available models from [Ollama Models Library](https://ollama.com/library)
 
 ## Environment Setup
 
 Create a `.env` file in the root directory with the following structure:
 
 ```
-API_URL=<LM_STUDIO_SERVER_URL>
-API_KEY=<CAN_BE_ANYTHING>
+MODEL_NAME=<MODEL_NAME>
+EMBEDDING_MODEL_NAME=<EMBEDDING_MODEL_NAME>
 MODEL_TEMPERATURE=<TEMPERATURE>
 DB_DIR=<PATH_TO_CHROMA_DB>
-EMBEDDING_MODEL=<EMBEDDING_MODEL_NAME>
 ```
 
 Make sure to replace `your_api_key_here` with your actual API key.
@@ -46,25 +56,7 @@ The application will be available at `http://localhost:8000`.
 
 ## API Documentation
 
-### Vector Store Endpoints
-
-- `GET /vector_stores`: Retrieve all vector stores
-- `POST /vector_stores`: Create a new vector store
-  - Body: `{"store_name": "your_store_name"}`
-- `POST /vector_stores/{store_name}/{file_type}`: Update a vector store with a file
-  - Path parameters: `store_name`, `file_type`
-  - Body: File upload
-- `DELETE /vector_stores`: Delete a vector store
-  - Body: `{"store_name": "your_store_name"}`
-
-### RAG Endpoints
-
-- `POST /rag/build`: Build a RAG chain for a vector store
-  - Body: `{"store_name": "your_store_name"}`
-- `POST /rag/chat`: Chat with the RAG system
-  - Body: `{"store_name": "your_store_name", "session_id": "unique_session_id", "question": "Your question here"}`
-
-For detailed API documentation, visit `http://localhost:8000/docs` after starting the application.
+Check [API Docs](./API.md) for details documentation.
 
 ## Project Structure
 
@@ -73,18 +65,20 @@ For detailed API documentation, visit `http://localhost:8000/docs` after startin
 ├── main.py
 ├── config.py
 ├── routers
-│   ├── rag.py
+│   ├── chat.py
+│   ├── session.py
 │   └── vector_store.py
 ├── schemas
 │   └── chat.py
 ├── services
-│   ├── rag.py
+│   ├── chat.py
+│   ├── file.py
+│   ├── session.py
 │   └── vector_store.py
-├── utils
-│   └── files.py
 ├── dependencies.py
 ├── .env
 ├── requirements.txt
+├── API.md
 └── README.md
 ```
 

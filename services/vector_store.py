@@ -2,8 +2,8 @@ import os
 import shutil
 from langchain_chroma import Chroma
 from langchain_community.embeddings import OllamaEmbeddings
-from langchain_community.document_loaders import JSONLoader, PyPDFLoader, CSVLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 
 class VectorStoreService:
     def __init__(self):
@@ -21,51 +21,13 @@ class VectorStoreService:
         if len(store_name) == 0:
             raise ValueError("Store name cannot be empty.")
 
-    def _validate_store_exists(self, existing_stores: list[str], store_name: str) -> None:
-        """
-        Validates if a vector store already exists.
-
-        Args:
-            existing_stores (list[str]): A list of existing vector stores.
-            store_name (str): The name of the vector store to check.
-        """
-        if not isinstance(existing_stores, list) or not all(isinstance(store, str) for store in existing_stores):
-            raise ValueError("Existing stores must be a non-empty list of strings.")
-        if store_name not in existing_stores:
-            raise ValueError(f"Vector store '{store_name}' does not exist.")
-
-    def _validate_file_type(self, file_type: str) -> None:
-        """
-        Validates if a file type is supported.
-
-        Args:
-            file_type (str): The type of the file.
-        """
-        if not isinstance(file_type, str):
-            raise ValueError("File type must be a string.")
-        supported_types = ['json', 'pdf', 'csv']
-        if file_type not in supported_types:
-            raise ValueError(f"Unsupported file type: {file_type}.")
-
-    def _load_file(self, file_path: str, file_type: str) -> dict:
-        """
-        Loads a file into memory.
-
-        Args:
-            file_path (str): The path to the file.
-            file_type (str): The type of the file.
-
-        Returns:
-            dict: A dictionary containing the loaded file data.
-        """
-        self._validate_file_type(file_type)
-        
-        if file_type == 'json':
-            return JSONLoader(file_path=file_path, jq_schema='.', text_content=False).load()
-        elif file_type == 'pdf':
-            return PyPDFLoader(file_path=file_path).load()
-        elif file_type == 'csv':
-            return CSVLoader(file_path=file_path).load()
+    def _get(self, store_name: str) -> Chroma:
+        local_embeddings = OllamaEmbeddings(model=os.getenv("EMBEDDING_MODEL_NAME"), show_progress=True)
+        return Chroma(
+            collection_name=store_name,
+            embedding_function=local_embeddings,
+            persist_directory=os.path.join(self.base_dir, store_name)
+        )
 
     def get_all(self) -> list[str]:
         """
@@ -95,12 +57,7 @@ class VectorStoreService:
         if not self.exists(store_name):
             raise ValueError(f"Vector store '{store_name}' does not exist.")
         
-        local_embeddings = OllamaEmbeddings(model=os.getenv("EMBEDDING_MODEL"), show_progress=True)
-        return Chroma(
-            collection_name=store_name,
-            embedding_function=local_embeddings,
-            persist_directory=os.path.join(self.base_dir, store_name)
-        )
+        return self._get(store_name)
 
     def exists(self, store_name: str) -> bool:
         """
@@ -130,14 +87,9 @@ class VectorStoreService:
         if self.exists(store_name):
             raise ValueError(f"Vector store '{store_name}' already exists.")
         
-        local_embeddings = OllamaEmbeddings(model=os.getenv("EMBEDDING_MODEL"), show_progress=True)
-        return Chroma(
-            collection_name=store_name,
-            embedding_function=local_embeddings,
-            persist_directory=os.path.join(self.base_dir, store_name)
-        )
+        return self._get(store_name)
 
-    def update(self, file: str, store_name: str, file_type: str) -> None:
+    def update(self, docs: list[Document], store_name: str) -> None:
         """
         Updates a vector store with the given file.
 
@@ -146,8 +98,6 @@ class VectorStoreService:
             store_name (str): The name of the vector store to be updated.
             file_type (str): The type of the file.
         """
-        docs = self._load_file(file, file_type)
-
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         chunks = text_splitter.split_documents(docs)
 
