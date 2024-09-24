@@ -101,7 +101,7 @@ class VectorStoreService:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         chunks = text_splitter.split_documents(docs)
 
-        local_embeddings = OllamaEmbeddings(model=os.getenv("EMBEDDING_MODEL"), show_progress=True)
+        local_embeddings = OllamaEmbeddings(model=os.getenv("EMBEDDING_MODEL_NAME"), show_progress=True)
         Chroma.from_documents(
             collection_name=store_name,
             documents=chunks,
