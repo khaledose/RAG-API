@@ -4,61 +4,61 @@
 
 ### Build Chat
 - **POST** `/chat/build`
-- Builds a chat session for a specific vector store.
-- Request body: `{ "store_name": "string" }`
+- Builds a chat session for a specific context.
+- Request body: `{ "context_name": "string" }`
 - Response: Confirmation message
 
 ### Chat
 - **POST** `/chat`
 - Initiates a chat session.
-- Request body: `{ "store_name": "string", "session_id": "UUID", "question": "string" }`
+- Request body: `{ "context_name": "string", "session_id": "UUID", "question": "string" }`
 - Response: Streaming response with chat replies
 
 ## Session Endpoints
 
 ### Get All Sessions
-- **GET** `/session/`
+- **GET** `/sessions`
 - Retrieves all active session IDs.
 
 ### Get Session
-- **GET** `/session/{session_id}`
+- **GET** `/sessions/{session_id}`
 - Retrieves chat history for a specific session.
 - Path parameter: `session_id` (UUID)
 
 ### Create Session
-- **POST** `/session/`
+- **POST** `/sessions`
 - Creates a new session.
 - Response: New session ID
 
 ### Delete Session
-- **DELETE** `/session/{session_id}`
+- **DELETE** `/sessions/{session_id}`
 - Deletes a specific session.
 - Path parameter: `session_id` (UUID)
 
 ### Clear All Sessions
-- **DELETE** `/session`
+- **DELETE** `/sessions`
 - Clears all active sessions.
 
-## Vector Store Endpoints
+## Context Endpoints
 
-### Get All Vector Stores
-- **GET** `/vector_stores`
-- Retrieves all vector stores.
+### Get All Contexts
+- **GET** `/contexts`
+- Retrieves all contexts.
 
-### Create Vector Store
-- **POST** `/vector_stores`
-- Creates a new vector store.
-- Request body: `{ "store_name": "string" }`
+### Create Context
+- **POST** `/contexts`
+- Creates a new context.
+- Request body: `{ "context_name": "string" }`
 
-### Update Vector Store
-- **POST** `/vector_stores/{store_name}`
-- Updates a vector store with new file data.
-- Path parameter: `store_name`
+### Update Context
+- **POST** `/contexts/file/{context_name}`
+- Updates a context with new file data.
+- Path parameter: `context_name`
 - Request body: File upload
 
-### Delete Vector Store
-- **DELETE** `/vector_stores`
-- Deletes a specific vector store.
-- Request body: `{ "store_name": "string" }`
+### Delete Context
+- **DELETE** `/contexts/{context_name}`
+- Deletes a specific context.
+- Path parameter: `context_name`
 
 Note: All endpoints may return appropriate HTTP error codes (e.g., 404, 500) with error details in case of failures.

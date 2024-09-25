@@ -9,9 +9,8 @@ This is a FastAPI application that implements a Retrieval-Augmented Generation (
 3. [Running the Application](#running-the-application)
 4. [API Documentation](#api-documentation)
 5. [Project Structure](#project-structure)
-6. [Configuration](#configuration)
-7. [Contributing](#contributing)
-8. [License](#license)
+6. [Contributing](#contributing)
+7. [License](#license)
 
 ## Installation
 
@@ -26,7 +25,7 @@ This is a FastAPI application that implements a Retrieval-Augmented Generation (
     ```
 3. Pull the embedding model from Ollama:
     ```
-    ollama pull <MODEL_NAME>
+    ollama pull <EMBEDDING_MODEL_NAME>
     ```
 
 You can get available models from [Ollama Models Library](https://ollama.com/library)
@@ -42,8 +41,6 @@ MODEL_TEMPERATURE=<TEMPERATURE>
 DB_DIR=<PATH_TO_CHROMA_DB>
 ```
 
-Make sure to replace `your_api_key_here` with your actual API key.
-
 ## Running the Application
 
 To run the FastAPI application:
@@ -52,7 +49,11 @@ To run the FastAPI application:
 uvicorn main:app --reload
 ```
 
-The application will be available at `http://localhost:8000`.
+Or you can make it available for the local network:
+
+```
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
 
 ## API Documentation
 
@@ -65,31 +66,22 @@ Check [API Docs](./API.md) for details documentation.
 ├── main.py
 ├── config.py
 ├── routers
-│   ├── chat.py
-│   ├── session.py
-│   └── vector_store.py
+│   ├── ChatRouter.py
+│   ├── SessionRouter.py
+│   └── ContextRouter.py
 ├── schemas
-│   └── chat.py
+│   └── Request.py
 ├── services
-│   ├── chat.py
-│   ├── file.py
-│   ├── session.py
-│   └── vector_store.py
+│   ├── ChatService.py
+│   ├── DocumentService.py
+│   ├── SessionService.py
+│   └── ContextService.py
 ├── dependencies.py
 ├── .env
 ├── requirements.txt
 ├── API.md
 └── README.md
 ```
-
-## Configuration
-
-The `config.py` file contains important system prompts for the RAG system:
-
-- `SYSTEM_PROMPT`: This is used to instruct the AI model on how to answer questions based on the retrieved context. It must contain `{context}` which is the placeholder for embeddings to be added to the prompt.
-- `HISTORY_PROMPT`: This is used to reformulate user questions in the context of the chat history, ensuring that the questions are standalone and can be understood without additional context.
-
-You can modify these prompts in the `config.py` file to adjust the behavior of your RAG system as needed.
 
 ## Contributing
 

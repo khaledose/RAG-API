@@ -1,10 +1,10 @@
 from uuid import UUID
 from pydantic import BaseModel
 
-class StoreRequest(BaseModel):
-    store_name: str
+class ContextRequest(BaseModel):
+    context_name: str
 
 class ChatRequest(BaseModel):
     session_id: UUID
-    store_name: str
+    context_name: str
     question: str

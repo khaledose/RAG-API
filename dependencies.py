@@ -1,20 +1,20 @@
-from services.chat import ChatService
-from services.file import FileService
-from services.session import SessionService
-from services.vector_store import VectorStoreService
+from services.ChatService import ChatService
+from services.DocumentService import DocumentService
+from services.SessionService import SessionService
+from services.ContextService import ContextService
 
-file_service = FileService()
-vector_service = VectorStoreService()
+document_service = DocumentService()
+context_service = ContextService()
 session_service = SessionService()
-chat_service = ChatService(vector_service, session_service)
+chat_service = ChatService(context_service, session_service)
 
-# Dependency for file_service
-def get_file_service() -> FileService:
-    return file_service
+# Dependency for document_service
+def get_document_service() -> DocumentService:
+    return document_service
 
-# Dependency for VectorStoreService
-def get_vector_store_service() -> VectorStoreService:
-    return vector_service
+# Dependency for ContextService
+def get_context_service() -> ContextService:
+    return context_service
 
 # Dependency for SessionService
 def get_session_service() -> SessionService:

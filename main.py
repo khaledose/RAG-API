@@ -1,10 +1,10 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from routers import chat, vector_store, session
+from routers import ChatRouter, ContextRouter, SessionRouter
 
 load_dotenv()
 
 app = FastAPI()
-app.include_router(vector_store.router)
-app.include_router(session.router)
-app.include_router(chat.router)
+app.include_router(ContextRouter.router)
+app.include_router(SessionRouter.router)
+app.include_router(ChatRouter.router)
